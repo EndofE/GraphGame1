@@ -1,0 +1,1126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"
+    />
+    <title>🎓 GRAPH MATCHER · function mastery</title>
+    <!-- math.js for safe function evaluation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: linear-gradient(145deg, #0b1729 0%, #1a2f3f 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family:
+          "Segoe UI",
+          Roboto,
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 16px;
+        margin: 0;
+      }
+      .game-container {
+        max-width: 700px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 215, 0, 0.2);
+        border-radius: 56px;
+        padding: 24px 20px 32px;
+        box-shadow:
+          0 30px 45px -20px black,
+          0 0 0 1px rgba(255, 215, 0, 0.1) inset;
+      }
+      /* top bar: timer + score + pause */
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 0 8px;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .timer-block {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 60px;
+        padding: 6px 18px 6px 12px;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+      }
+      .timer-icon {
+        font-size: 1.6rem;
+        line-height: 1;
+        filter: drop-shadow(0 0 4px gold);
+      }
+      #timer {
+        font-size: 2.2rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: #f5e56b;
+        text-shadow: 0 0 8px #ffb347;
+        transition:
+          color 0.2s,
+          transform 0.2s;
+        min-width: 70px;
+        text-align: center;
+      }
+      .timer-critical {
+        color: #ff3a2f !important;
+        transform: scale(1.1);
+        text-shadow: 0 0 12px #ff0000 !important;
+      }
+      .timer-warning {
+        color: #ffaa33 !important;
+      }
+      .pause-btn {
+        background: #3a4a62;
+        border: 1px solid #f5b151;
+        border-radius: 50px;
+        padding: 8px 18px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #f5eac1;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #1f2a36;
+        transition: all 0.07s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .pause-btn:active {
+        transform: translateY(4px);
+        box-shadow: none;
+      }
+      .score-block {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 60px;
+        padding: 6px 22px 6px 18px;
+        border: 1px solid #ffd966;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .coin-icon {
+        font-size: 2rem;
+        filter: drop-shadow(0 0 6px gold);
+      }
+      #score {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #ffd966;
+      }
+      /* hint display */
+      .hint-area {
+        margin: 5px 0 15px;
+        text-align: center;
+        min-height: 32px;
+      }
+      #hintText {
+        background: #1f3140;
+        display: inline-block;
+        padding: 8px 24px;
+        border-radius: 40px;
+        font-size: 1.3rem;
+        font-family: "Courier New", monospace;
+        color: #ffdb8e;
+        border: 1px solid #f5b151;
+        box-shadow: 0 0 12px #ffa726;
+        letter-spacing: 1px;
+      }
+      /* bonus popup container */
+      .bonus-container {
+        position: fixed;
+        top: 30%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        pointer-events: none;
+      }
+      .bonus-popup {
+        background: #f5e56b;
+        color: #1d2b36;
+        font-weight: 800;
+        font-size: 1.8rem;
+        padding: 16px 32px;
+        border-radius: 60px;
+        box-shadow:
+          0 0 30px #ffd700,
+          0 8px 0 #b8860b;
+        border: 2px solid white;
+        animation: popupFade 2s ease-out forwards;
+        white-space: nowrap;
+      }
+      @keyframes popupFade {
+        0% {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        20% {
+          opacity: 1;
+          transform: scale(1.1);
+        }
+        40% {
+          transform: scale(1);
+        }
+        80% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-40px);
+        }
+      }
+      /* canvas area */
+      .graph-panel {
+        background: #0a111c;
+        border-radius: 48px;
+        padding: 18px;
+        margin-bottom: 18px;
+        border: 2px solid rgba(255, 215, 0, 0.25);
+        box-shadow: 0 0 30px rgba(255, 200, 0, 0.1);
+      }
+      canvas {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1/1;
+        background: #0b1422;
+        border-radius: 32px;
+        box-shadow:
+          0 0 0 2px #2e3b4e,
+          0 15px 25px -10px black;
+        touch-action: none;
+      }
+      /* function entry */
+      .function-entry {
+        background: rgba(10, 20, 30, 0.7);
+        border-radius: 100px;
+        padding: 6px 6px 6px 24px;
+        margin: 16px 0 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        border: 1px solid #f0b853;
+      }
+      .function-label {
+        color: #b9d2e7;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        font-size: 1rem;
+      }
+      #functionInput {
+        flex: 2 1 200px;
+        background: #1f3348;
+        border: none;
+        padding: 14px 20px;
+        border-radius: 50px;
+        font-size: 1.2rem;
+        font-family: "Courier New", monospace;
+        color: #f5e56b;
+        outline: 2px solid transparent;
+        transition: 0.15s;
+        border: 1px solid #5d7a9a;
+      }
+      #functionInput:focus {
+        outline: 2px solid #ffb74d;
+        background: #142433;
+      }
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      button {
+        background: #2f455e;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 26px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #f5f0d7;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 6px 0 #0f1a24;
+        transition: all 0.07s ease;
+        border: 1px solid #f5b151;
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+      button:active {
+        transform: translateY(5px);
+        box-shadow: 0 1px 0 #0f1a24;
+      }
+      button:disabled {
+        opacity: 0.4;
+        transform: none;
+        box-shadow: 0 4px 0 #0f1a24;
+        pointer-events: none;
+      }
+      .submit-btn {
+        background: #3f5f3c;
+        border-color: #a5d6a5;
+      }
+      .accuracy-indicator {
+        background: #09161e;
+        border-radius: 40px;
+        padding: 12px 20px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.2rem;
+        border: 1px solid #f0b853;
+        margin: 6px 0 12px;
+        color: #cfdfee;
+      }
+      #accuracyPercent {
+        font-weight: 700;
+        color: #ffd966;
+      }
+      #earnedCoins {
+        font-weight: 700;
+        color: #ffd966;
+      }
+      /* info panel */
+      .info-panel {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin: 18px 0 10px;
+      }
+      .past-scores {
+        flex: 2;
+        background: #10212b;
+        border-radius: 32px;
+        padding: 16px;
+        border: 1px solid #7a6b3c;
+      }
+      .past-scores h4,
+      .skill-box h4 {
+        color: #eac784;
+        font-weight: 400;
+        letter-spacing: 1px;
+        margin-bottom: 6px;
+        font-size: 1rem;
+        text-transform: uppercase;
+      }
+      #scoreHistory {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 14px;
+        font-size: 1.3rem;
+        color: #ffe2a3;
+      }
+      .skill-box {
+        flex: 1;
+        background: #10212b;
+        border-radius: 32px;
+        padding: 16px;
+        border: 1px solid #7a6b3c;
+      }
+      #skillLevelText {
+        color: #b0e0ff;
+        font-style: italic;
+        font-size: 1.05rem;
+      }
+      .play-again {
+        display: flex;
+        justify-content: flex-end;
+      }
+      #playAgainBtn {
+        background: #3b2d5e;
+        border-color: #b494f0;
+      }
+      /* game over tab - redesigned with corner X */
+      .gameover-tab {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 450px;
+        background: #1e2f3a;
+        border: 4px solid #ffaa33;
+        border-radius: 60px 60px 20px 20px;
+        box-shadow: 0 0 40px gold;
+        padding: 25px 30px;
+        z-index: 1000;
+        display: none;
+        backdrop-filter: blur(12px);
+        color: #f5eac1;
+      }
+      .gameover-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+        color: #ffd966;
+        position: relative;
+      }
+      #gameoverScore {
+        color: #ffffff;
+        background: #2d4a3a;
+        padding: 5px 20px;
+        border-radius: 40px;
+        font-size: 2rem;
+      }
+      .close-tab {
+        background: #c04040;
+        border: none;
+        font-size: 2rem;
+        color: white;
+        cursor: pointer;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 0 #6d1a1a;
+        transition: 0.07s;
+        font-weight: bold;
+        border: 2px solid #ffbaba;
+        position: absolute;
+        top: -15px;
+        right: -15px;
+      }
+      .close-tab:active {
+        transform: translateY(4px);
+        box-shadow: none;
+      }
+      .gameover-detail {
+        font-size: 1.8rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      /* coin animation layer */
+      .coin-rain-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999;
+      }
+      .floating-coin {
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        background: radial-gradient(circle at 30% 30%, #fff2b5, #e5a00b);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: bold;
+        color: #b65103;
+        box-shadow:
+          0 0 20px #f5e56b,
+          0 8px 10px rgba(0, 0, 0, 0.6);
+        border: 2px solid #faf0b0;
+        will-change: transform, opacity;
+        animation: coinFloat 0.7s ease-out forwards;
+        pointer-events: none;
+      }
+      @keyframes coinFloat {
+        0% {
+          transform: scale(0.3) translate(0, 0);
+          opacity: 1;
+        }
+        40% {
+          transform: scale(1.3) translate(-10px, -50px);
+          opacity: 1;
+        }
+        80% {
+          transform: scale(0.9) translate(40px, -130px);
+          opacity: 0.9;
+        }
+        100% {
+          transform: scale(0.4) translate(120px, -200px);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-container">
+      <!-- top stats with pause button -->
+      <div class="stats">
+        <div class="timer-block">
+          <span class="timer-icon">⏳</span>
+          <span id="timer">60</span>
+        </div>
+        <div class="pause-btn" id="pauseBtn">⏸️ PAUSE</div>
+        <div class="score-block">
+          <span class="coin-icon">🪙</span>
+          <span id="score">0</span>
+        </div>
+      </div>
+
+      <!-- hint display -->
+      <div class="hint-area" id="hintArea" style="display: none">
+        <span id="hintText"></span>
+      </div>
+
+      <!-- graph canvas -->
+      <div class="graph-panel">
+        <canvas id="graphCanvas" width="500" height="500"></canvas>
+      </div>
+
+      <!-- function input -->
+      <div class="function-entry">
+        <span class="function-label">f(x) =</span>
+        <input
+          type="text"
+          id="functionInput"
+          placeholder="e.g. x^2 + 1"
+          value="x^2"
+          spellcheck="false"
+        />
+        <div class="action-buttons">
+          <button class="submit-btn" id="submitBtn">✓ MATCH</button>
+        </div>
+      </div>
+
+      <!-- accuracy & coin preview -->
+      <div class="accuracy-indicator">
+        <span>🎯 accuracy: <span id="accuracyPercent">0%</span></span>
+        <span>🪙 this try: <span id="earnedCoins">0</span></span>
+      </div>
+
+      <!-- info row -->
+      <div class="info-panel">
+        <div class="past-scores">
+          <h4>📋 past scores</h4>
+          <div id="scoreHistory">—</div>
+        </div>
+        <div class="skill-box">
+          <h4>📈 skill level</h4>
+          <div id="skillLevelText">novice</div>
+        </div>
+      </div>
+
+      <!-- play again -->
+      <div class="play-again">
+        <button id="playAgainBtn">⟳ PLAY AGAIN</button>
+      </div>
+    </div>
+
+    <!-- bonus popup container -->
+    <div class="bonus-container" id="bonusContainer"></div>
+
+    <!-- game over popup tab with corner X -->
+    <div class="gameover-tab" id="gameoverTab">
+      <div class="gameover-header">
+        <span>🏁 GAME OVER</span>
+        <span id="gameoverScore">0</span>
+        <button class="close-tab" id="closeGameoverTab">✕</button>
+      </div>
+      <div class="gameover-detail">
+        <span>Final score:</span>
+        <span></span>
+        <!-- placeholder -->
+      </div>
+    </div>
+
+    <!-- coin animation container -->
+    <div class="coin-rain-container" id="coinContainer"></div>
+
+    <script>
+      (function () {
+        const math = window.math;
+
+        // ---------- TIERED FUNCTION POOL ----------
+        // Adaptive difficulty: scales based on player's average score
+        const TARGET_POOLS = {
+          novice: ["x", "2*x", "-x", "x + 2", "abs(x)"],
+          apprentice: ["x^2", "2*x^2 - 1", "-x^2 + 3", "x^3", "sqrt(abs(x))"],
+          skilled: ["-x^3 + 2*x", "x^3 - 3*x", "1/x", "-1/x", "1/x^2"],
+          expert: ["exp(x/2)", "sin(x)", "cos(x)", "sin(x) + x", "cos(2*x)"],
+        };
+
+        // ---------- GAME STATE ----------
+        let currentDifficulty = "novice";
+        let currentTargetExpr = "x^2";
+        let currentScore = 0;
+        let timerSeconds = 60;
+        let timerInterval = null;
+        let gameActive = true;
+        let paused = false;
+        let pastScores = [];
+
+        // Per-graph tracking
+        let attemptCount = 0;
+        let hintShown = false;
+        let bestAccuracyThisGraph = 0;
+        let graphStartTime = null;
+        let firstTryBonusUsed = false;
+        let quickBonusUsed = false;
+        let lastUserExpr = null; // Used for drawing error shading
+
+        // Audio
+        let audioCtx = null;
+        let soundEnabled = false;
+
+        // DOM Elements
+        const canvas = document.getElementById("graphCanvas");
+        const ctx = canvas.getContext("2d");
+        const timerEl = document.getElementById("timer");
+        const scoreEl = document.getElementById("score");
+        const accuracyEl = document.getElementById("accuracyPercent");
+        const earnedCoinsEl = document.getElementById("earnedCoins");
+        const functionInput = document.getElementById("functionInput");
+        const submitBtn = document.getElementById("submitBtn");
+        const playAgainBtn = document.getElementById("playAgainBtn");
+        const pauseBtn = document.getElementById("pauseBtn");
+        const scoreHistoryDiv = document.getElementById("scoreHistory");
+        const skillLevelText = document.getElementById("skillLevelText");
+        const coinContainer = document.getElementById("coinContainer");
+        const hintArea = document.getElementById("hintArea");
+        const hintText = document.getElementById("hintText");
+        const gameoverTab = document.getElementById("gameoverTab");
+        const gameoverScoreSpan = document.getElementById("gameoverScore");
+        const closeGameoverTab = document.getElementById("closeGameoverTab");
+        const bonusContainer = document.getElementById("bonusContainer");
+
+        // ---------- HELPER: ADAPTIVE TARGET SELECTION ----------
+        function pickRandomTarget() {
+          const pool = TARGET_POOLS[currentDifficulty];
+          const randomIdx = Math.floor(Math.random() * pool.length);
+          currentTargetExpr = pool[randomIdx];
+        }
+
+        // ---------- DRAW GRAPH (Target + User + Error Shading) ----------
+        function drawGraph(userExpr = null) {
+          lastUserExpr = userExpr;
+          const w = canvas.width,
+            h = canvas.height;
+          ctx.clearRect(0, 0, w, h);
+
+          const SAMPLES = 300;
+          const xMin = -5,
+            xMax = 5;
+          const xs = [];
+          for (let i = 0; i <= SAMPLES; i++) {
+            xs.push(xMin + ((xMax - xMin) * i) / SAMPLES);
+          }
+
+          // evaluate target
+          let targetVals = [];
+          let validIndices = [];
+          xs.forEach((x, idx) => {
+            try {
+              const val = math.evaluate(currentTargetExpr, { x });
+              if (Number.isFinite(val)) {
+                targetVals[idx] = val;
+                validIndices.push(idx);
+              } else {
+                targetVals[idx] = NaN;
+              }
+            } catch (e) {
+              targetVals[idx] = NaN;
+            }
+          });
+
+          let validTargets = targetVals.filter((v) => Number.isFinite(v));
+          let minY = Math.min(...validTargets, -3);
+          let maxY = Math.max(...validTargets, 3);
+          let rangeY = maxY - minY;
+          if (rangeY < 1e-6) rangeY = 6;
+          const pad = rangeY * 0.15;
+          minY -= pad;
+          maxY += pad;
+
+          function mapX(x) {
+            return ((x - xMin) / (xMax - xMin)) * w;
+          }
+          function mapY(y) {
+            return h - ((y - minY) / (maxY - minY)) * h;
+          }
+
+          // grid
+          ctx.strokeStyle = "#3a4e66";
+          ctx.lineWidth = 0.7;
+          for (let i = -5; i <= 5; i += 1) {
+            ctx.beginPath();
+            let xPos = mapX(i);
+            ctx.moveTo(xPos, 0);
+            ctx.lineTo(xPos, h);
+            ctx.strokeStyle = "#2a3f55";
+            ctx.stroke();
+          }
+          for (let i = Math.floor(minY); i <= Math.ceil(maxY); i += 1) {
+            let yPos = mapY(i);
+            ctx.beginPath();
+            ctx.moveTo(0, yPos);
+            ctx.lineTo(w, yPos);
+            ctx.strokeStyle = "#2a3f55";
+            ctx.stroke();
+          }
+
+          // axes
+          ctx.beginPath();
+          ctx.strokeStyle = "#7f8fa3";
+          ctx.lineWidth = 2.5;
+          ctx.moveTo(mapX(0), 0);
+          ctx.lineTo(mapX(0), h);
+          ctx.moveTo(0, mapY(0));
+          ctx.lineTo(w, mapY(0));
+          ctx.stroke();
+
+          // User function & Error Shading
+          if (userExpr && gameActive) {
+            let userVals = [];
+
+            // Calculate and draw shading first so it sits behind the lines
+            ctx.fillStyle = "rgba(255, 60, 60, 0.15)"; // Faint red for error
+
+            for (let i = 0; i <= SAMPLES; i++) {
+              let x = xs[i];
+              let y;
+              try {
+                y = math.evaluate(userExpr, { x });
+                userVals[i] = Number.isFinite(y) ? y : NaN;
+              } catch (e) {
+                userVals[i] = NaN;
+              }
+
+              // Draw vertical shading lines between target and user
+              if (
+                Number.isFinite(userVals[i]) &&
+                Number.isFinite(targetVals[i])
+              ) {
+                let canvasX = mapX(x);
+                let targetCanvasY = mapY(targetVals[i]);
+                let userCanvasY = mapY(userVals[i]);
+
+                ctx.beginPath();
+                ctx.moveTo(canvasX, targetCanvasY);
+                ctx.lineTo(canvasX, userCanvasY);
+                ctx.strokeStyle = "rgba(255, 100, 100, 0.1)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+              }
+            }
+
+            // Draw user curve
+            ctx.beginPath();
+            ctx.strokeStyle = "#7af0a3";
+            ctx.lineWidth = 3;
+            let firstUser = true;
+            for (let i = 0; i <= SAMPLES; i++) {
+              if (!Number.isFinite(userVals[i])) continue;
+              let canvasX = mapX(xs[i]);
+              let canvasY = mapY(userVals[i]);
+              if (firstUser) {
+                ctx.moveTo(canvasX, canvasY);
+                firstUser = false;
+              } else {
+                ctx.lineTo(canvasX, canvasY);
+              }
+            }
+            ctx.stroke();
+          }
+
+          // target (faint dashed - drawn last so it stays on top)
+          ctx.beginPath();
+          ctx.strokeStyle = "#f0e68c";
+          ctx.lineWidth = 3.5;
+          ctx.setLineDash([8, 8]);
+          let first = true;
+          for (let idx of validIndices) {
+            let x = xs[idx];
+            let y = targetVals[idx];
+            if (!Number.isFinite(y)) continue;
+            let canvasX = mapX(x);
+            let canvasY = mapY(y);
+            if (first) {
+              ctx.moveTo(canvasX, canvasY);
+              first = false;
+            } else {
+              ctx.lineTo(canvasX, canvasY);
+            }
+          }
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        // ---------- COMPUTE RMSE ACCURACY ----------
+        function evaluateMatch(userExpr) {
+          const SAMPLES = 200;
+          const xMin = -5,
+            xMax = 5;
+          let errorSum = 0;
+          let count = 0;
+
+          for (let i = 0; i <= SAMPLES; i++) {
+            let x = xMin + ((xMax - xMin) * i) / SAMPLES;
+            let targetVal, userVal;
+            try {
+              targetVal = math.evaluate(currentTargetExpr, { x });
+              userVal = math.evaluate(userExpr, { x });
+            } catch (e) {
+              continue;
+            }
+            if (Number.isFinite(targetVal) && Number.isFinite(userVal)) {
+              let diff = targetVal - userVal;
+              errorSum += diff * diff;
+              count++;
+            }
+          }
+
+          if (count < 10) return { accuracy: 0, coins: 0 };
+
+          let rmse = Math.sqrt(errorSum / count);
+          let accuracy = Math.max(
+            0,
+            Math.min(100, 100 * Math.exp(-0.5 * rmse)),
+          );
+          if (rmse < 0.05) accuracy = 100; // slightly more forgiving threshold
+          let coinsEarned = Math.floor(accuracy);
+          return {
+            accuracy: Math.round(accuracy * 10) / 10,
+            coins: coinsEarned,
+          };
+        }
+
+        // ---------- REAL TIME SYNTAX VALIDATION ----------
+        functionInput.addEventListener("input", (e) => {
+          const rawExpr = e.target.value.trim();
+          if (rawExpr === "") {
+            functionInput.style.borderColor = "#5d7a9a";
+            return;
+          }
+          try {
+            math.parse(normalizeFunctionString(rawExpr));
+            functionInput.style.borderColor = "#7af0a3"; // Green for valid
+            submitBtn.disabled = false;
+          } catch (err) {
+            functionInput.style.borderColor = "#ff3a2f"; // Red for invalid
+            submitBtn.disabled = true;
+          }
+        });
+
+        // ---------- ADVANCED NORMALIZATION ----------
+        function normalizeFunctionString(expr) {
+          let s = expr.replace(/\s+/g, "");
+          s = s.replace(/sinx/g, "sin(x)");
+          s = s.replace(/cosx/g, "cos(x)");
+          s = s.replace(/tanx/g, "tan(x)");
+          s = s.replace(/e\^\(([^)]+)\)/g, "exp($1)");
+          s = s.replace(/e\^([a-zA-Z0-9]+)/g, "exp($1)");
+          s = s.replace(/(\d)([a-zA-Z\(])/g, "$1*$2");
+          return s;
+        }
+
+        // ---------- SOUND HELPERS ----------
+        function initAudio() {
+          if (audioCtx) return;
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        function playSound(type) {
+          if (!audioCtx) initAudio();
+          if (audioCtx.state === "suspended") {
+            audioCtx
+              .resume()
+              .then(() => playSound(type))
+              .catch(() => {});
+            return;
+          }
+          if (!audioCtx) return;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.type = "sine";
+          let freq = 600,
+            duration = 0.12;
+          if (type === "correct") {
+            freq = 880;
+            duration = 0.2;
+          } else if (type === "wrong") {
+            freq = 240;
+            duration = 0.2;
+          } else if (type === "tick") {
+            freq = 420;
+            duration = 0.05;
+            gain.gain.value = 0.15;
+          } else if (type === "collect") {
+            freq = 1400;
+            duration = 0.1;
+            gain.gain.value = 0.3;
+          }
+          osc.frequency.value = freq;
+          gain.gain.value = 0.2;
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function spawnCoins(amount, fromX = 300, fromY = 300) {
+          const coinCount = Math.min(
+            12,
+            Math.max(1, Math.floor(amount / 7) + 1),
+          );
+          for (let i = 0; i < coinCount; i++) {
+            const coin = document.createElement("div");
+            coin.className = "floating-coin";
+            coin.textContent = "🪙";
+            coin.style.left = fromX + (Math.random() * 60 - 30) + "px";
+            coin.style.top = fromY + (Math.random() * 60 - 30) + "px";
+            coin.style.animationDelay = i * 0.03 + "s";
+            coinContainer.appendChild(coin);
+            setTimeout(() => {
+              if (coin.parentNode) coin.remove();
+            }, 800);
+          }
+          if (soundEnabled) playSound("collect");
+        }
+
+        function showBonusMessage(text) {
+          const popup = document.createElement("div");
+          popup.className = "bonus-popup";
+          popup.textContent = text;
+          bonusContainer.appendChild(popup);
+          setTimeout(() => popup.remove(), 1900);
+        }
+
+        // ---------- GAME LOOP AND LOGIC ----------
+        function updateTimerDisplay() {
+          timerEl.textContent = timerSeconds;
+          if (timerSeconds <= 15) {
+            timerEl.className = "timer-critical";
+          } else if (timerSeconds <= 30) {
+            timerEl.className = "timer-warning";
+          } else {
+            timerEl.className = "";
+          }
+        }
+
+        function startTimer() {
+          if (timerInterval) clearInterval(timerInterval);
+          timerInterval = setInterval(() => {
+            if (paused || !gameActive) return;
+            timerSeconds = Math.max(0, timerSeconds - 1);
+            updateTimerDisplay();
+
+            if (timerSeconds <= 30 && timerSeconds > 0 && soundEnabled)
+              playSound("tick");
+            if (timerSeconds <= 0) {
+              gameActive = false;
+              clearInterval(timerInterval);
+              submitBtn.disabled = true;
+              if (currentScore > 0) pastScores.push(currentScore);
+              updateHistory();
+              updateSkillLevel();
+              playSound("wrong");
+              gameoverScoreSpan.textContent = currentScore;
+              gameoverTab.style.display = "block";
+            }
+          }, 1000);
+        }
+
+        function updateHistory() {
+          scoreHistoryDiv.innerText =
+            pastScores.length === 0 ? "—" : pastScores.join("  🪙  ");
+        }
+
+        function updateSkillLevel() {
+          let avg =
+            pastScores.length > 0
+              ? pastScores.reduce((a, b) => a + b, 0) / pastScores.length
+              : currentScore;
+
+          // Dynamically adjust the difficulty tier based on average performance
+          if (avg < 40) {
+            currentDifficulty = "novice";
+            skillLevelText.innerText = "novice · learning the curves";
+          } else if (avg < 80) {
+            currentDifficulty = "apprentice";
+            skillLevelText.innerText = "apprentice · gaining intuition";
+          } else if (avg < 150) {
+            currentDifficulty = "skilled";
+            skillLevelText.innerText = "skilled · strong function sense";
+          } else {
+            currentDifficulty = "expert";
+            skillLevelText.innerText = "expert · function master";
+          }
+        }
+
+        function resetForNewGraph() {
+          attemptCount = 0;
+          hintShown = false;
+          bestAccuracyThisGraph = 0;
+          graphStartTime = performance.now();
+          firstTryBonusUsed = false;
+          quickBonusUsed = false;
+          hintArea.style.display = "none";
+          hintText.innerText = "";
+          accuracyEl.textContent = "0%";
+          earnedCoinsEl.textContent = "0";
+          functionInput.value = "";
+          functionInput.style.borderColor = "#5d7a9a";
+        }
+
+        function advanceToNewTarget() {
+          pickRandomTarget();
+          resetForNewGraph();
+          drawGraph(null);
+        }
+
+        function handleSubmit() {
+          if (!gameActive || paused) return;
+          const rawExpr = functionInput.value.trim();
+          if (rawExpr === "") return;
+
+          const normalizedUser = normalizeFunctionString(rawExpr);
+          attemptCount++;
+
+          const { accuracy, coins } = evaluateMatch(normalizedUser);
+          accuracyEl.textContent = accuracy + "%";
+          earnedCoinsEl.textContent = coins;
+
+          if (attemptCount <= 5 && accuracy > bestAccuracyThisGraph) {
+            bestAccuracyThisGraph = accuracy;
+          }
+
+          if (!hintShown && attemptCount >= 5) {
+            hintShown = true;
+            hintText.innerText = `f(x) = ${currentTargetExpr}`;
+            hintArea.style.display = "block";
+          }
+
+          const normalizedTarget = normalizeFunctionString(currentTargetExpr);
+          const isExactMatch =
+            normalizedUser === normalizedTarget || accuracy === 100;
+
+          if (isExactMatch) {
+            if (soundEnabled) playSound("correct");
+            let coinAward = Math.min(
+              100,
+              Math.max(0, Math.floor(bestAccuracyThisGraph)),
+            );
+            if (coinAward === 0 && accuracy === 100) coinAward = 100;
+
+            if (graphStartTime) {
+              const timeTaken = (performance.now() - graphStartTime) / 1000;
+              if (attemptCount === 1 && !firstTryBonusUsed) {
+                coinAward += 10;
+                showBonusMessage("First Try! Bonus +10 🪙");
+                firstTryBonusUsed = true;
+              }
+              if (timeTaken <= 5.0 && !quickBonusUsed) {
+                coinAward += 10;
+                showBonusMessage("Quick Try! Bonus +10 🪙");
+                quickBonusUsed = true;
+              }
+            }
+
+            currentScore += coinAward;
+            scoreEl.textContent = currentScore;
+
+            const rect = canvas.getBoundingClientRect();
+            spawnCoins(
+              coinAward,
+              rect.left + rect.width / 2,
+              rect.top + rect.height / 3,
+            );
+
+            timerSeconds += 15; // Time bonus for correct answer
+            updateTimerDisplay();
+
+            advanceToNewTarget();
+            updateSkillLevel();
+            return;
+          }
+
+          if (soundEnabled) playSound("wrong");
+          drawGraph(normalizedUser);
+        }
+
+        function resetGame() {
+          if (timerInterval) clearInterval(timerInterval);
+          currentScore = 0;
+          scoreEl.textContent = "0";
+          timerSeconds = 60;
+          gameActive = true;
+          paused = false;
+          pauseBtn.textContent = "⏸️ PAUSE";
+          submitBtn.disabled = false;
+          updateTimerDisplay();
+          updateSkillLevel(); // Ensure difficulty is set correctly before picking
+          pickRandomTarget();
+          resetForNewGraph();
+          drawGraph(null);
+          updateHistory();
+          gameoverTab.style.display = "none";
+          startTimer();
+        }
+
+        function togglePause() {
+          if (!gameActive) return;
+          paused = !paused;
+          pauseBtn.textContent = paused ? "▶️ RESUME" : "⏸️ PAUSE";
+        }
+
+        function initGame() {
+          updateSkillLevel();
+          pickRandomTarget();
+          resetForNewGraph();
+          drawGraph(null);
+          startTimer();
+          updateHistory();
+
+          document.body.addEventListener(
+            "click",
+            function enableAudio() {
+              if (!soundEnabled) {
+                soundEnabled = true;
+                initAudio();
+                playSound("correct");
+              }
+            },
+            { once: true },
+          );
+
+          closeGameoverTab.addEventListener("click", () => {
+            gameoverTab.style.display = "none";
+          });
+        }
+
+        submitBtn.addEventListener("click", handleSubmit);
+        functionInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter" && !submitBtn.disabled) {
+            e.preventDefault();
+            handleSubmit();
+          }
+        });
+        playAgainBtn.addEventListener("click", resetGame);
+        pauseBtn.addEventListener("click", togglePause);
+
+        initGame();
+      })();
+    </script>
+  </body>
+</html>

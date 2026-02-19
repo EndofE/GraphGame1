@@ -806,6 +806,65 @@
           };
         }
 
+        // ---------- INTELLIGENT HINT GENERATOR ----------
+        function generateIntelligentHint(targetExpr, userExpr) {
+          try {
+            const targetNode = math.compile(targetExpr);
+            const userNode = math.compile(userExpr);
+
+            // 1. Check Y-Intercept (Vertical Shift) at x = 0
+            let targetY0 = targetNode.evaluate({ x: 0 });
+            let userY0 = userNode.evaluate({ x: 0 });
+
+            if (Number.isFinite(targetY0) && Number.isFinite(userY0)) {
+              let diff = targetY0 - userY0;
+              if (Math.abs(diff) > 0.1) {
+                if (userY0 > targetY0)
+                  return "📉 Too high! Check your y-intercept or vertical shift.";
+                return "📈 Too low! Check your y-intercept or vertical shift.";
+              }
+            }
+
+            // 2. Check Sign Inversion (Flipped Graph)
+            let targetY1 = targetNode.evaluate({ x: 1 });
+            let userY1 = userNode.evaluate({ x: 1 });
+
+            if (Number.isFinite(targetY1) && Number.isFinite(userY1)) {
+              // If they have the right y-intercept but opposite values at x=1
+              if (
+                Math.abs(targetY1 + userY1) < 0.1 &&
+                Math.abs(targetY1) > 0.1
+              ) {
+                return "🙃 Upside down! Double-check your positive/negative signs.";
+              }
+            }
+
+            // 3. Check Amplitude / Steepness
+            let targetY2 = targetNode.evaluate({ x: 2 });
+            let userY2 = userNode.evaluate({ x: 2 });
+
+            if (
+              Number.isFinite(targetY2) &&
+              Number.isFinite(userY2) &&
+              userY2 !== 0 &&
+              targetY2 !== 0
+            ) {
+              let ratio = Math.abs(targetY2) / Math.abs(userY2);
+              if (ratio > 1.2) {
+                return "⛰️ Not steep enough! Try increasing your multiplier/coefficient.";
+              } else if (ratio < 0.8) {
+                return "🏔️ Too steep! Try decreasing your multiplier/coefficient.";
+              }
+            }
+
+            // 4. Default Fallback
+            return "🤔 Close! Check your exponents or horizontal shifts.";
+          } catch (e) {
+            // Failsafe in case evaluation breaks
+            return "🔍 Keep adjusting your numbers!";
+          }
+        }
+
         // ---------- REAL TIME SYNTAX VALIDATION ----------
         functionInput.addEventListener("input", (e) => {
           const rawExpr = e.target.value.trim();

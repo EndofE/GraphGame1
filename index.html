@@ -20,7 +20,12 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+        font-family:
+          "Segoe UI",
+          Roboto,
+          system-ui,
+          -apple-system,
+          sans-serif;
         padding: 16px;
         margin: 0;
       }
@@ -33,7 +38,9 @@
         border: 1px solid rgba(255, 215, 0, 0.2);
         border-radius: 56px;
         padding: 24px 20px 32px;
-        box-shadow: 0 30px 45px -20px black, 0 0 0 1px rgba(255, 215, 0, 0.1) inset;
+        box-shadow:
+          0 30px 45px -20px black,
+          0 0 0 1px rgba(255, 215, 0, 0.1) inset;
       }
       /* top bar: timer + score + pause */
       .stats {
@@ -65,7 +72,9 @@
         font-variant-numeric: tabular-nums;
         color: #f5e56b;
         text-shadow: 0 0 8px #ffb347;
-        transition: color 0.2s, transform 0.2s;
+        transition:
+          color 0.2s,
+          transform 0.2s;
         min-width: 70px;
         text-align: center;
       }
@@ -152,17 +161,32 @@
         font-size: 1.8rem;
         padding: 16px 32px;
         border-radius: 60px;
-        box-shadow: 0 0 30px #ffd700, 0 8px 0 #b8860b;
+        box-shadow:
+          0 0 30px #ffd700,
+          0 8px 0 #b8860b;
         border: 2px solid white;
         animation: popupFade 2s ease-out forwards;
         white-space: nowrap;
       }
       @keyframes popupFade {
-        0% { opacity: 0; transform: scale(0.5); }
-        20% { opacity: 1; transform: scale(1.1); }
-        40% { transform: scale(1); }
-        80% { opacity: 1; }
-        100% { opacity: 0; transform: translateY(-40px); }
+        0% {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        20% {
+          opacity: 1;
+          transform: scale(1.1);
+        }
+        40% {
+          transform: scale(1);
+        }
+        80% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-40px);
+        }
       }
       /* canvas area */
       .graph-panel {
@@ -182,7 +206,9 @@
         aspect-ratio: 1/1;
         background: #0b1422;
         border-radius: 32px;
-        box-shadow: 0 0 0 2px #2e3b4e, 0 15px 25px -10px black;
+        box-shadow:
+          0 0 0 2px #2e3b4e,
+          0 15px 25px -10px black;
         touch-action: none;
       }
       /* function entry */
@@ -330,13 +356,15 @@
         position: fixed;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%); 
+        transform: translate(-50%, -50%);
         width: 90%;
         max-width: 400px;
         background: linear-gradient(145deg, #1e2f3a 0%, #15222a 100%);
         border: 3px solid #ffaa33;
         border-radius: 32px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 170, 51, 0.4);
+        box-shadow:
+          0 20px 50px rgba(0, 0, 0, 0.8),
+          0 0 30px rgba(255, 170, 51, 0.4);
         padding: 40px 30px;
         z-index: 1000;
         display: none;
@@ -393,7 +421,9 @@
         font-size: 3.8rem;
         font-weight: 900;
         border: 2px solid #a5d6a5;
-        box-shadow: 0 0 20px rgba(45, 74, 58, 0.8) inset, 0 8px 0 #1c3025;
+        box-shadow:
+          0 0 20px rgba(45, 74, 58, 0.8) inset,
+          0 8px 0 #1c3025;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
       /* coin animation layer */
@@ -418,17 +448,31 @@
         font-size: 28px;
         font-weight: bold;
         color: #b65103;
-        box-shadow: 0 0 20px #f5e56b, 0 8px 10px rgba(0, 0, 0, 0.6);
+        box-shadow:
+          0 0 20px #f5e56b,
+          0 8px 10px rgba(0, 0, 0, 0.6);
         border: 2px solid #faf0b0;
         will-change: transform, opacity;
         animation: coinFloat 0.7s ease-out forwards;
         pointer-events: none;
       }
       @keyframes coinFloat {
-        0% { transform: scale(0.3) translate(0, 0); opacity: 1; }
-        40% { transform: scale(1.3) translate(-10px, -50px); opacity: 1; }
-        80% { transform: scale(0.9) translate(40px, -130px); opacity: 0.9; }
-        100% { transform: scale(0.4) translate(120px, -200px); opacity: 0; }
+        0% {
+          transform: scale(0.3) translate(0, 0);
+          opacity: 1;
+        }
+        40% {
+          transform: scale(1.3) translate(-10px, -50px);
+          opacity: 1;
+        }
+        80% {
+          transform: scale(0.9) translate(40px, -130px);
+          opacity: 0.9;
+        }
+        100% {
+          transform: scale(0.4) translate(120px, -200px);
+          opacity: 0;
+        }
       }
 
       /* =========================================
@@ -443,14 +487,14 @@
           padding: 12px 14px 16px;
           border-radius: 36px;
         }
-        
+
         /* Hides non-essential panels when typing */
         .game-container:focus-within .accuracy-indicator,
         .game-container:focus-within .info-panel,
         .game-container:focus-within .play-again {
           display: none !important;
         }
-        
+
         /* Shrinks top bar when typing */
         .game-container:focus-within .stats {
           margin-bottom: 8px;
@@ -464,17 +508,19 @@
           gap: 12px;
           margin-bottom: 12px;
         }
-        #timer, #score {
+        #timer,
+        #score {
           font-size: 1.6rem;
         }
-        .timer-icon, .coin-icon {
+        .timer-icon,
+        .coin-icon {
           font-size: 1.4rem;
         }
         .pause-btn {
           font-size: 1rem;
           padding: 6px 14px;
         }
-        
+
         /* Allows graph to dynamically shrink vertically */
         .graph-panel {
           padding: 10px;
@@ -512,7 +558,7 @@
           padding: 10px 16px;
           font-size: 1rem;
         }
-        
+
         .accuracy-indicator {
           font-size: 1rem;
           padding: 10px 16px;
@@ -520,7 +566,8 @@
         .info-panel {
           flex-direction: column;
         }
-        .past-scores, .skill-box {
+        .past-scores,
+        .skill-box {
           text-align: center;
         }
         #scoreHistory {
@@ -682,11 +729,13 @@
 
         function drawGraph(userExpr = null) {
           lastUserExpr = userExpr;
-          const w = canvas.width, h = canvas.height;
+          const w = canvas.width,
+            h = canvas.height;
           ctx.clearRect(0, 0, w, h);
 
           const SAMPLES = 300;
-          const xMin = -5, xMax = 5;
+          const xMin = -5,
+            xMax = 5;
           const xs = [];
           for (let i = 0; i <= SAMPLES; i++) {
             xs.push(xMin + ((xMax - xMin) * i) / SAMPLES);
@@ -717,8 +766,12 @@
           minY -= pad;
           maxY += pad;
 
-          function mapX(x) { return ((x - xMin) / (xMax - xMin)) * w; }
-          function mapY(y) { return h - ((y - minY) / (maxY - minY)) * h; }
+          function mapX(x) {
+            return ((x - xMin) / (xMax - xMin)) * w;
+          }
+          function mapY(y) {
+            return h - ((y - minY) / (maxY - minY)) * h;
+          }
 
           ctx.strokeStyle = "#3a4e66";
           ctx.lineWidth = 0.7;
@@ -750,7 +803,7 @@
 
           if (userExpr && gameActive) {
             let userVals = [];
-            ctx.fillStyle = "rgba(255, 60, 60, 0.15)"; 
+            ctx.fillStyle = "rgba(255, 60, 60, 0.15)";
 
             for (let i = 0; i <= SAMPLES; i++) {
               let x = xs[i];
@@ -762,7 +815,10 @@
                 userVals[i] = NaN;
               }
 
-              if (Number.isFinite(userVals[i]) && Number.isFinite(targetVals[i])) {
+              if (
+                Number.isFinite(userVals[i]) &&
+                Number.isFinite(targetVals[i])
+              ) {
                 let canvasX = mapX(x);
                 let targetCanvasY = mapY(targetVals[i]);
                 let userCanvasY = mapY(userVals[i]);
@@ -818,7 +874,8 @@
 
         function evaluateMatch(userExpr) {
           const SAMPLES = 200;
-          const xMin = -5, xMax = 5;
+          const xMin = -5,
+            xMax = 5;
           let errorSum = 0;
           let count = 0;
 
@@ -841,10 +898,16 @@
           if (count < 10) return { accuracy: 0, coins: 0 };
 
           let rmse = Math.sqrt(errorSum / count);
-          let accuracy = Math.max(0, Math.min(100, 100 * Math.exp(-0.5 * rmse)));
+          let accuracy = Math.max(
+            0,
+            Math.min(100, 100 * Math.exp(-0.5 * rmse)),
+          );
           if (rmse < 0.05) accuracy = 100;
           let coinsEarned = Math.floor(accuracy);
-          return { accuracy: Math.round(accuracy * 10) / 10, coins: coinsEarned };
+          return {
+            accuracy: Math.round(accuracy * 10) / 10,
+            coins: coinsEarned,
+          };
         }
 
         // ---------- INTELLIGENT HINT GENERATOR ----------
@@ -859,7 +922,8 @@
             if (Number.isFinite(targetY0) && Number.isFinite(userY0)) {
               let diff = targetY0 - userY0;
               if (Math.abs(diff) > 0.1) {
-                if (userY0 > targetY0) return "📉 Too high! Check your y-intercept.";
+                if (userY0 > targetY0)
+                  return "📉 Too high! Check your y-intercept.";
                 return "📈 Too low! Check your y-intercept.";
               }
             }
@@ -868,7 +932,10 @@
             let userY1 = userNode.evaluate({ x: 1 });
 
             if (Number.isFinite(targetY1) && Number.isFinite(userY1)) {
-              if (Math.abs(targetY1 + userY1) < 0.1 && Math.abs(targetY1) > 0.1) {
+              if (
+                Math.abs(targetY1 + userY1) < 0.1 &&
+                Math.abs(targetY1) > 0.1
+              ) {
                 return "🙃 Upside down! Double-check your positive/negative signs.";
               }
             }
@@ -876,7 +943,12 @@
             let targetY2 = targetNode.evaluate({ x: 2 });
             let userY2 = userNode.evaluate({ x: 2 });
 
-            if (Number.isFinite(targetY2) && Number.isFinite(userY2) && userY2 !== 0 && targetY2 !== 0) {
+            if (
+              Number.isFinite(targetY2) &&
+              Number.isFinite(userY2) &&
+              userY2 !== 0 &&
+              targetY2 !== 0
+            ) {
               let ratio = Math.abs(targetY2) / Math.abs(userY2);
               if (ratio > 1.2) {
                 return "⛰️ Not steep enough! Increase your multiplier.";
@@ -929,7 +1001,10 @@
         function playSound(type) {
           if (!audioCtx) initAudio();
           if (audioCtx.state === "suspended") {
-            audioCtx.resume().then(() => playSound(type)).catch(() => {});
+            audioCtx
+              .resume()
+              .then(() => playSound(type))
+              .catch(() => {});
             return;
           }
           if (!audioCtx) return;
@@ -938,11 +1013,23 @@
           osc.connect(gain);
           gain.connect(audioCtx.destination);
           osc.type = "sine";
-          let freq = 600, duration = 0.12;
-          if (type === "correct") { freq = 880; duration = 0.2; } 
-          else if (type === "wrong") { freq = 240; duration = 0.2; } 
-          else if (type === "tick") { freq = 420; duration = 0.05; gain.gain.value = 0.15; } 
-          else if (type === "collect") { freq = 1400; duration = 0.1; gain.gain.value = 0.3; }
+          let freq = 600,
+            duration = 0.12;
+          if (type === "correct") {
+            freq = 880;
+            duration = 0.2;
+          } else if (type === "wrong") {
+            freq = 240;
+            duration = 0.2;
+          } else if (type === "tick") {
+            freq = 420;
+            duration = 0.05;
+            gain.gain.value = 0.15;
+          } else if (type === "collect") {
+            freq = 1400;
+            duration = 0.1;
+            gain.gain.value = 0.3;
+          }
           osc.frequency.value = freq;
           gain.gain.value = 0.2;
           osc.start();
@@ -950,7 +1037,10 @@
         }
 
         function spawnCoins(amount, fromX = 300, fromY = 300) {
-          const coinCount = Math.min(12, Math.max(1, Math.floor(amount / 7) + 1));
+          const coinCount = Math.min(
+            12,
+            Math.max(1, Math.floor(amount / 7) + 1),
+          );
           for (let i = 0; i < coinCount; i++) {
             const coin = document.createElement("div");
             coin.className = "floating-coin";
@@ -959,7 +1049,9 @@
             coin.style.top = fromY + (Math.random() * 60 - 30) + "px";
             coin.style.animationDelay = i * 0.03 + "s";
             coinContainer.appendChild(coin);
-            setTimeout(() => { if (coin.parentNode) coin.remove(); }, 800);
+            setTimeout(() => {
+              if (coin.parentNode) coin.remove();
+            }, 800);
           }
           if (soundEnabled) playSound("collect");
         }
@@ -990,7 +1082,8 @@
             timerSeconds = Math.max(0, timerSeconds - 1);
             updateTimerDisplay();
 
-            if (timerSeconds <= 15 && timerSeconds > 0 && soundEnabled) playSound("tick");
+            if (timerSeconds <= 15 && timerSeconds > 0 && soundEnabled)
+              playSound("tick");
             if (timerSeconds <= 0) {
               gameActive = false;
               clearInterval(timerInterval);
@@ -1006,11 +1099,15 @@
         }
 
         function updateHistory() {
-          scoreHistoryDiv.innerText = pastScores.length === 0 ? "—" : pastScores.join("  🪙  ");
+          scoreHistoryDiv.innerText =
+            pastScores.length === 0 ? "—" : pastScores.join("  🪙  ");
         }
 
         function updateSkillLevel() {
-          let avg = pastScores.length > 0 ? pastScores.reduce((a, b) => a + b, 0) / pastScores.length : currentScore;
+          let avg =
+            pastScores.length > 0
+              ? pastScores.reduce((a, b) => a + b, 0) / pastScores.length
+              : currentScore;
           if (avg < 250) {
             currentDifficulty = "novice";
             skillLevelText.innerText = "novice · learning the curves";
@@ -1065,24 +1162,31 @@
 
           // Show intelligent hint on attempt 3 or 4
           if (attemptCount === 3 || attemptCount === 4) {
-            const smartHint = generateIntelligentHint(currentTargetExpr, normalizedUser);
+            const smartHint = generateIntelligentHint(
+              currentTargetExpr,
+              normalizedUser,
+            );
             hintText.innerText = smartHint;
-            hintArea.style.display = 'block';
+            hintArea.style.display = "block";
           }
-          
+
           // Reveal the exact function on attempt 5
           if (!hintShown && attemptCount >= 5) {
             hintShown = true;
             hintText.innerText = `Answer: f(x) = ${currentTargetExpr}`;
-            hintArea.style.display = 'block';
+            hintArea.style.display = "block";
           }
 
           const normalizedTarget = normalizeFunctionString(currentTargetExpr);
-          const isExactMatch = normalizedUser === normalizedTarget || accuracy === 100;
+          const isExactMatch =
+            normalizedUser === normalizedTarget || accuracy === 100;
 
           if (isExactMatch) {
             if (soundEnabled) playSound("correct");
-            let coinAward = Math.min(100, Math.max(0, Math.floor(bestAccuracyThisGraph)));
+            let coinAward = Math.min(
+              100,
+              Math.max(0, Math.floor(bestAccuracyThisGraph)),
+            );
             if (coinAward === 0 && accuracy === 100) coinAward = 100;
 
             if (graphStartTime) {
@@ -1103,7 +1207,11 @@
             scoreEl.textContent = currentScore;
 
             const rect = canvas.getBoundingClientRect();
-            spawnCoins(coinAward, rect.left + rect.width / 2, rect.top + rect.height / 3);
+            spawnCoins(
+              coinAward,
+              rect.left + rect.width / 2,
+              rect.top + rect.height / 3,
+            );
 
             timerSeconds = Math.min(60, timerSeconds + 15);
             updateTimerDisplay();
@@ -1150,13 +1258,17 @@
           startTimer();
           updateHistory();
 
-          document.body.addEventListener("click", function enableAudio() {
+          document.body.addEventListener(
+            "click",
+            function enableAudio() {
               if (!soundEnabled) {
                 soundEnabled = true;
                 initAudio();
                 playSound("correct");
               }
-            }, { once: true });
+            },
+            { once: true },
+          );
 
           closeGameoverTab.addEventListener("click", () => {
             gameoverTab.style.display = "none";
@@ -1178,3 +1290,4 @@
     </script>
   </body>
 </html>
+

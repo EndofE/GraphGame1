@@ -7,7 +7,6 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"
     />
     <title>🎓 GRAPH MATCHER · function mastery</title>
-    <!-- math.js for safe function evaluation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.min.js"></script>
     <style>
       * {
@@ -349,41 +348,82 @@
         background: #3b2d5e;
         border-color: #b494f0;
       }
-      /* game over tab - redesigned with corner X */
+      /* --- GAME OVER MODAL (Centered & Clean) --- */
       .gameover-tab {
         position: fixed;
-        bottom: 30px;
+        top: 50%;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translate(-50%, -50%); /* Centers the modal perfectly */
         width: 90%;
-        max-width: 450px;
-        background: #1e2f3a;
-        border: 4px solid #ffaa33;
-        border-radius: 60px 60px 20px 20px;
-        box-shadow: 0 0 40px gold;
-        padding: 25px 30px;
+        max-width: 400px;
+        background: linear-gradient(145deg, #1e2f3a 0%, #15222a 100%);
+        border: 3px solid #ffaa33;
+        border-radius: 32px;
+        box-shadow:
+          0 20px 50px rgba(0, 0, 0, 0.8),
+          0 0 30px rgba(255, 170, 51, 0.4);
+        padding: 40px 30px;
         z-index: 1000;
         display: none;
         backdrop-filter: blur(12px);
-        color: #f5eac1;
+        text-align: center;
       }
-      .gameover-header {
+      .gameover-tab .close-tab {
+        background: #2a3f55;
+        border: 2px solid #5d7a9a;
+        font-size: 1.5rem;
+        color: #b9d2e7;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        font-size: 2rem;
+        justify-content: center;
+        box-shadow: 0 4px 0 #15222a;
+        transition: all 0.1s;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+      }
+      .gameover-tab .close-tab:active {
+        transform: translateY(4px);
+        box-shadow: none;
+      }
+      .gameover-tab .close-tab:hover {
+        background: #c04040;
+        border-color: #ffbaba;
+        color: white;
+      }
+      .gameover-title {
+        font-size: 2.2rem;
         font-weight: 800;
-        margin-bottom: 15px;
+        margin-bottom: 25px;
         color: #ffd966;
-        position: relative;
+        letter-spacing: 1px;
+      }
+      .gameover-label {
+        font-size: 1.2rem;
+        color: #b9d2e7;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 12px;
       }
       #gameoverScore {
+        display: inline-block;
         color: #ffffff;
         background: #2d4a3a;
-        padding: 5px 20px;
-        border-radius: 40px;
-        font-size: 2rem;
+        padding: 10px 40px;
+        border-radius: 50px;
+        font-size: 3.8rem;
+        font-weight: 900;
+        border: 2px solid #a5d6a5;
+        box-shadow:
+          0 0 20px rgba(45, 74, 58, 0.8) inset,
+          0 8px 0 #1c3025;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
+
       .close-tab {
         background: #c04040;
         border: none;
@@ -533,16 +573,10 @@
 
     <!-- game over popup tab with corner X -->
     <div class="gameover-tab" id="gameoverTab">
-      <div class="gameover-header">
-        <span>🏁 GAME OVER</span>
-        <span id="gameoverScore">0</span>
-        <button class="close-tab" id="closeGameoverTab">✕</button>
-      </div>
-      <div class="gameover-detail">
-        <span>Final score:</span>
-        <span></span>
-        <!-- placeholder -->
-      </div>
+      <button class="close-tab" id="closeGameoverTab">✕</button>
+      <div class="gameover-title">🏁 GAME OVER</div>
+      <div class="gameover-label">FINAL SCORE</div>
+      <div id="gameoverScore">0</div>
     </div>
 
     <!-- coin animation container -->
@@ -552,7 +586,6 @@
       (function () {
         const math = window.math;
 
-        // ---------- TIERED FUNCTION POOL ----------
         // Adaptive difficulty: scales based on player's average score
         const TARGET_POOLS = {
           novice: ["x", "2*x", "-x", "x + 2", "abs(x)"],
@@ -608,11 +641,21 @@
         // ---------- HELPER: ADAPTIVE TARGET SELECTION ----------
         function pickRandomTarget() {
           const pool = TARGET_POOLS[currentDifficulty];
-          const randomIdx = Math.floor(Math.random() * pool.length);
-          currentTargetExpr = pool[randomIdx];
+          let newTarget = currentTargetExpr;
+
+          // If there's more than 1 option in the pool, keep picking until it's different
+          if (pool.length > 1) {
+            while (newTarget === currentTargetExpr) {
+              const randomIdx = Math.floor(Math.random() * pool.length);
+              newTarget = pool[randomIdx];
+            }
+          } else {
+            newTarget = pool[0];
+          }
+
+          currentTargetExpr = newTarget;
         }
 
-        // ---------- DRAW GRAPH (Target + User + Error Shading) ----------
         function drawGraph(userExpr = null) {
           lastUserExpr = userExpr;
           const w = canvas.width,
@@ -806,65 +849,6 @@
           };
         }
 
-        // ---------- INTELLIGENT HINT GENERATOR ----------
-        function generateIntelligentHint(targetExpr, userExpr) {
-          try {
-            const targetNode = math.compile(targetExpr);
-            const userNode = math.compile(userExpr);
-
-            // 1. Check Y-Intercept (Vertical Shift) at x = 0
-            let targetY0 = targetNode.evaluate({ x: 0 });
-            let userY0 = userNode.evaluate({ x: 0 });
-
-            if (Number.isFinite(targetY0) && Number.isFinite(userY0)) {
-              let diff = targetY0 - userY0;
-              if (Math.abs(diff) > 0.1) {
-                if (userY0 > targetY0)
-                  return "📉 Too high! Check your y-intercept or vertical shift.";
-                return "📈 Too low! Check your y-intercept or vertical shift.";
-              }
-            }
-
-            // 2. Check Sign Inversion (Flipped Graph)
-            let targetY1 = targetNode.evaluate({ x: 1 });
-            let userY1 = userNode.evaluate({ x: 1 });
-
-            if (Number.isFinite(targetY1) && Number.isFinite(userY1)) {
-              // If they have the right y-intercept but opposite values at x=1
-              if (
-                Math.abs(targetY1 + userY1) < 0.1 &&
-                Math.abs(targetY1) > 0.1
-              ) {
-                return "🙃 Upside down! Double-check your positive/negative signs.";
-              }
-            }
-
-            // 3. Check Amplitude / Steepness
-            let targetY2 = targetNode.evaluate({ x: 2 });
-            let userY2 = userNode.evaluate({ x: 2 });
-
-            if (
-              Number.isFinite(targetY2) &&
-              Number.isFinite(userY2) &&
-              userY2 !== 0 &&
-              targetY2 !== 0
-            ) {
-              let ratio = Math.abs(targetY2) / Math.abs(userY2);
-              if (ratio > 1.2) {
-                return "⛰️ Not steep enough! Try increasing your multiplier/coefficient.";
-              } else if (ratio < 0.8) {
-                return "🏔️ Too steep! Try decreasing your multiplier/coefficient.";
-              }
-            }
-
-            // 4. Default Fallback
-            return "🤔 Close! Check your exponents or horizontal shifts.";
-          } catch (e) {
-            // Failsafe in case evaluation breaks
-            return "🔍 Keep adjusting your numbers!";
-          }
-        }
-
         // ---------- REAL TIME SYNTAX VALIDATION ----------
         functionInput.addEventListener("input", (e) => {
           const rawExpr = e.target.value.trim();
@@ -984,7 +968,7 @@
             timerSeconds = Math.max(0, timerSeconds - 1);
             updateTimerDisplay();
 
-            if (timerSeconds <= 30 && timerSeconds > 0 && soundEnabled)
+            if (timerSeconds <= 15 && timerSeconds > 0 && soundEnabled)
               playSound("tick");
             if (timerSeconds <= 0) {
               gameActive = false;
@@ -1012,18 +996,19 @@
               : currentScore;
 
           // Dynamically adjust the difficulty tier based on average performance
-          if (avg < 40) {
+          // A perfect graph grants up to 120 points (100 accuracy + 20 bonuses)
+          if (avg < 250) {
             currentDifficulty = "novice";
             skillLevelText.innerText = "novice · learning the curves";
-          } else if (avg < 80) {
+          } else if (avg < 600) {
             currentDifficulty = "apprentice";
             skillLevelText.innerText = "apprentice · gaining intuition";
-          } else if (avg < 150) {
+          } else if (avg < 1200) {
             currentDifficulty = "skilled";
-            skillLevelText.innerText = "skilled · strong function sense";
+            skillLevelText.innerText = "pro · strong function sense";
           } else {
             currentDifficulty = "expert";
-            skillLevelText.innerText = "expert · function master";
+            skillLevelText.innerText = "master · graphing legend";
           }
         }
 
@@ -1106,7 +1091,7 @@
               rect.top + rect.height / 3,
             );
 
-            timerSeconds += 15; // Time bonus for correct answer
+            timerSeconds = Math.min(60, timerSeconds + 15); // Caps the max time at 60 seconds// Time bonus for correct answer
             updateTimerDisplay();
 
             advanceToNewTarget();
@@ -1128,7 +1113,7 @@
           pauseBtn.textContent = "⏸️ PAUSE";
           submitBtn.disabled = false;
           updateTimerDisplay();
-          updateSkillLevel(); // Ensure difficulty is set correctly before picking
+          updateSkillLevel();
           pickRandomTarget();
           resetForNewGraph();
           drawGraph(null);

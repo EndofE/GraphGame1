@@ -253,7 +253,7 @@ function cleanHint(s) {
   return s.length > 220 ? s.slice(0, 220) + '…' : s;
 }
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
   console.log(`game running on http://localhost:${PORT}`);
 });

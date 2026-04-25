@@ -1,10 +1,5 @@
-/* =============================================================
-   FEED THE FUNCTION — asset-driven layout
-   Frame background: MainPageStripped.png (empty pills + frame, no buttons)
-   Buttons: .btn-slot containers at pixel-measured positions, each
-   with a Shadow (background) + Face (top) image. Face translates
-   down on press to cover half the exposed shadow.
-   ============================================================= */
+/* 
+   FEED THE FUNCTION — assets */
 
 :root {
   --font: 'Fredoka', system-ui, sans-serif;
@@ -33,9 +28,9 @@ body {
   overflow: hidden;
 }
 
-/* -------------------------------------------------------------
+/*
    Screen + frame
-   ------------------------------------------------------------- */
+   */
 .screen {
   display: none;
   align-items: center;
@@ -45,7 +40,7 @@ body {
 }
 .screen.home-screen { display: flex; }
 
-/* 3:4 frame mirrors the 1728x2304 PNG canvas */
+/* 3:4 frame for the 1728x2304 PNG canvas */
 .frame {
   position: relative;
   height: min(100vh, calc(100vw * 4 / 3));
@@ -65,14 +60,7 @@ body {
   z-index: 1;
 }
 
-/* =============================================================
-   BUTTON SLOTS (shadow + face per button)
-   Each slot is absolutely positioned at the button's bbox (as
-   % of frame). Inside: a Shadow img and a Face img, each sized
-   so its PNG content bbox aligns with the slot. overflow:hidden
-   crops away the transparent PNG padding. On press, the Face
-   translates down a fraction, revealing the Shadow behind/below.
-   ============================================================= */
+
 .btn-slot {
   position: absolute;
   left: var(--bx);
@@ -108,25 +96,10 @@ body {
 }
 .btn-slot.pressed > img.face { filter: brightness(0.95); }
 
-/* --- Per-button positioning and crop math -----------------------
-   Slot position = button bbox measured from MainPageEx diff.
-   img width/height/left/top = % values that make each PNG's
-   content bbox align to the slot; formula:
-     w%   = 1728  / content_w * 100
-     h%   = 2304  / content_h * 100
-     left = -content_left / content_w * 100
-     top  = -content_top  / content_h * 100
---------------------------------------------------------------- */
 
-/* Shared: both face and shadow imgs use IDENTICAL crop math so their
-   content lands at natural canvas coordinates inside the slot. Shadow
-   sits behind (z=1); face sits on top (z=2) and translates DOWN on
-   press, revealing the shadow band above.
-   Slot height = combined content height (face_top → shadow_bottom). */
 
-/* PAUSE — pink button top-center.
-   Face (362,610,1365,1693) 1004x1084; Shadow (363,692,1364,1693) 1002x1002
-   Combined = (362,610,1365,1693) h=1084 (shadow is within face vertically). */
+
+/* PAUSE */
 .slot-pause {
   --bx: 45.55%; --by: 11.65%; --bw: 7.70%; --bh: 6.50%;
 }
@@ -147,9 +120,7 @@ body {
 .slot-pause.is-paused > img.shadow-unpause,
 .slot-pause.is-paused > img.face-unpause { opacity: 1; }
 
-/* CHECK — green circle to the right of the f(x) input.
-   Face (235,503,1532,1800) 1298x1298; Shadow (235,548,1532,1845) 1298x1298.
-   Combined = (235,503,1532,1845) 1298x1343. */
+/* CHECK */
 .slot-check {
   --bx: 74.10%; --by: 62.40%; --bw: 11.30%; --bh: 9.10%;
 }
@@ -159,13 +130,7 @@ body {
 }
 .slot-check.pressed > img.face { transform: translateY(1.68%); }
 
-/* MENU — lavender pill bottom-left.
-   Face (101,834,1626,1392) 1526x559; Shadow (101,914,1626,1472) 1526x559.
-   Combined = (101,834,1626,1472) 1526x639. */
-/* MENU — lavender pill bottom-left. */
-/* Perfectly aligns under the High Score pill */
-/* MENU — layered pill bottom-left. */
-
+/* MENU */
 .slot-menu {
   --bx: 15%;
   --by: 84%;
@@ -175,7 +140,7 @@ body {
   border-radius: 1.6vh;
 }
 
-/* RESTART — layered pill bottom-right. */
+/* RESTART */
 .slot-restart {
   --bx: 63%;
   --by: 84%;
@@ -198,15 +163,13 @@ body {
   transform: translateY(-50%);
 }
 
-/* Press: face slides down a small amount; rounded slot keeps corners smooth */
+/* Press: face slides down a small amount, rounded slot*/
 .slot-menu.pressed > img.face,
 .slot-restart.pressed > img.face {
   transform: translateY(calc(-50% + 3px));
 }
-/* =============================================================
-   HIT BUTTONS (transparent overlay buttons for non-slot uses)
-   Used on home/settings/howto screens and gameover modal.
-   ============================================================= */
+/*
+   HIT BUTTONS */
 .hit-btn {
   position: absolute;
   background: transparent;
@@ -231,12 +194,8 @@ body {
   outline-offset: 2px;
 }
 
-/* =============================================================
-   HOME-SCREEN (and panel-screen) asset buttons
-   Each home button uses a full-canvas *Full.png that's cropped
-   via a transparent .asset-btn slot and scaled so the baked art
-   aligns with the slot. On press the .asset-face translates.
-   ============================================================= */
+/* 
+   HOME-SCREEN */
 .asset-btn {
   position: absolute;
   border: 0;
@@ -251,44 +210,59 @@ body {
   height: var(--bh);
 }
 .asset-btn:disabled { cursor: default; filter: grayscale(0.4) brightness(0.9); }
-.asset-face {
+.asset-face,
+.asset-shadow {
   position: absolute;
   pointer-events: none;
   -webkit-user-drag: none;
+}
+.asset-face {
+  z-index: 2;
   transition: transform 0.1s ease-out, filter 0.1s ease-out;
 }
+.asset-shadow { z-index: 1; }
 .asset-btn.pressed .asset-face {
   transform: translateY(35%);
   filter: brightness(0.96);
 }
 
-/* HomePage.png bakes in all three home buttons (green Play, orange
-   How to Play, gray Settings). Our buttons are invisible hotspots. */
-.btn-play     { --bx: 35.76%; --by: 68.1%; --bw: 28.59%; --bh: 9.1%; border-radius: 24px; }
-.btn-howto    { --bx: 14.4%;  --by: 79.0%; --bw: 31.6%;  --bh: 7.5%; border-radius: 24px; }
-.btn-settings { --bx: 54.5%;  --by: 79.0%; --bw: 30.5%;  --bh: 7.5%; border-radius: 24px; }
-.btn-play .asset-face, .btn-play .asset-shadow,
-.btn-howto .asset-face, .btn-settings .asset-face { display: none; }
-.btn-play:active, .btn-howto:active, .btn-settings:active { filter: brightness(0.9); }
+/* HomePage.png  */
+.btn-play     { --bx: 35.76%; --by: 68.06%; --bw: 28.59%; --bh: 8.98%; border-radius: 24px; }
+.btn-howto    { --bx: 14.65%; --by: 79.51%; --bw: 31.19%; --bh: 8.38%; border-radius: 24px; }
+.btn-settings { --bx: 54.81%; --by: 79.51%; --bw: 30.15%; --bh: 8.38%; border-radius: 24px; }
+
+.btn-play > .asset-face,
+.btn-play > .asset-shadow {
+  width: 124.14%; height: 389.19%; left: -11.78%; top: -144.59%;
+}
+.btn-howto > .asset-face,
+.btn-howto > .asset-shadow {
+  width: 124.59%; height: 463.58%; left: -12.26%; top: -181.69%;
+}
+.btn-settings > .asset-face,
+.btn-settings > .asset-shadow {
+  width: 121.09%; height: 435.54%; left: -10.51%; top: -167.67%;
+}
+
+.btn-play.pressed > .asset-face     { transform: translateY(3.5%); }
+.btn-howto.pressed > .asset-face    { transform: translateY(3.3%); }
+.btn-settings.pressed > .asset-face { transform: translateY(3.3%); }
 
 /* Menu button on Settings/How-To panels */
 .btn-menu-home { --bx: 38%; --by: 90%; --bw: 24%; --bh: 7%; overflow: visible; border-radius: 1.6vh; }
 .btn-menu-home > .asset-face { position: absolute; width: 100%; height: auto; left: 0; top: 50%; transform: translateY(-50%); }
 
-/* =============================================================
+/* 
    OVERLAY (text layered over baked pills)
-   ============================================================= */
+  */
 .overlay {
   position: absolute;
   z-index: 5;
   font-family: var(--font);
 }
 
-/* -------- Game screen overlays (positions from MainPageStripped) -------- */
 
-/* Timer pill — number centered in the dark-purple pill right of the
-   hourglass. Pill x=267-642, y=324-415 in 1728x2304 canvas. Value
-   area (right of hourglass at x≈370): x=370-642, y=324-400. */
+/* Timer pill*/
 .timer-value {
   left: 22.6%; top: 13.4%; width: 14.5%; height: 3.5%;
   display: flex; align-items: center; justify-content: center;
@@ -309,8 +283,7 @@ body {
   border-radius: 6px;
 }
 
-/* Score pill — number centered in dark-purple pill left of the coin.
-   Pill x=1079-1435, y=324-415; value area x=1079-1315. */
+/* Score pill  */
 .score-value {
   left: 63.3%; top: 13.4%; width: 12.2%; height: 3.5%;
   display: flex; align-items: center; justify-content: center;
@@ -328,7 +301,6 @@ body {
 }
 #graphCanvas { width: 100%; height: 100%; display: block; }
 
-/* f(x)= input: white input field x=276-1189, y=1474-1589 in canvas. */
 .input-slot {
   left: 15.97%; top: 63.98%; width: 52.84%; height: 4.99%;
   display: flex; align-items: center;
@@ -351,9 +323,7 @@ body {
   font-weight: 400;
 }
 
-/* High Score value — inside lower darker area of HS pill.
-   Pill y=1589-1902, label baked in upper ~y=1589-1690,
-   value area y=1690-1880, centered in pill x=239-899. */
+
 .hs-value {
   left: 12.80%; top: 73.61%; width: 38.25%; height: 8.33%;
   display: flex; align-items: center; justify-content: center;
@@ -362,7 +332,6 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Skill Level value — pill x=850-1488 (value area x=899-1488). */
 .skill-value {
   left: 52.02%; top: 73.61%; width: 34.10%; height: 8.33%;
   display: flex; align-items: center; justify-content: center;
@@ -371,8 +340,7 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Hint / reveal banner — sits near the top of the graph area, beneath
-   the pause button, in the same lavender/purple palette as the card. */
+/* Hint / reveal banner */
 .hint-area {
   left: 18%; top: 20.5%; width: 64%;
   padding: 6px 14px;
@@ -394,9 +362,9 @@ body {
   color: #4a2d06;
 }
 
-/* =============================================================
+/* 
    SETTINGS + HOW TO panel overlay
-   ============================================================= */
+   */
 .panel-overlay {
   position: absolute;
   left: 22%; top: 40%; right: 22%; bottom: 15%;
@@ -406,8 +374,21 @@ body {
   overflow-y: auto;
   z-index: 4;
 }
-/* SETTINGS / HOW TO titles are baked into the PNG — overlay hidden */
+/* SETTINGS / HOW TO */
 .panel-title { display: none !important; }
+
+/* Close (X) hotspot*/
+.panel-close {
+  position: absolute;
+  left: 75.7%; top: 29.0%;
+  width: 6.4%; height: 4.8%;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  z-index: 12;
+  border-radius: 50%;
+}
+.panel-close:hover { transform: scale(1.08); }
 .panel-heading {
   font-weight: 700; color: var(--ink);
   font-size: clamp(11px, 1.55vh, 16px);
@@ -454,10 +435,7 @@ body {
 }
 .accent-yellow { color: #c9a51c; font-weight: 600; }
 
-/* =============================================================
-   MODALS (game over / analysis) — use the full screen PNGs
-   with baked buttons; overlays are text + click hotspots.
-   ============================================================= */
+
 .modal {
   position: fixed; inset: 0;
   background: rgba(20, 10, 50, 0.55);
@@ -469,11 +447,11 @@ body {
   aspect-ratio: 3 / 4;
 }
 
-/* Close (X) hotspot — over baked X circle */
+
 .asset-close {
   position: absolute;
-  right: 12.6%; top: 29.0%;
-  width: 7%; height: 5.2%;
+  right: 18.0%; top: 29.0%;
+  width: 6.4%; height: 4.8%;
   background: transparent;
   border: 0;
   cursor: pointer;
@@ -495,28 +473,23 @@ body {
   color: var(--ink);
 }
 
-/* Game-over button hotspots (measured from GameOverScreen diff) */
 .btn-ai-analysis { --bx: 18.87%; --by: 60.07%; --bw: 23.32%; --bh: 7.81%; border-radius: 22px; }
 .btn-play-again  { --bx: 55.61%; --by: 60.07%; --bw: 23.27%; --bh: 7.81%; border-radius: 22px; }
 
-/* Analysis modal title baked into PNG; overlay hidden but kept for a11y */
 .analysis-title { display: none !important; }
 .analysis-body {
-  left: 14%; top: 38%; width: 72%; height: 36%;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.55);
-  border-radius: 16px;
-  font-size: clamp(11px, 1.55vh, 16px);
-  line-height: 1.55;
+  left: 22%; top: 44%; width: 56%; height: 36%;
+  padding: 0;
+  background: transparent;
+  font-size: clamp(10px, 1.4vh, 15px);
+  line-height: 1.5;
   color: var(--ink);
   overflow-y: auto;
   white-space: pre-wrap;
   font-weight: 500;
 }
 
-/* =============================================================
-   BONUS / COIN FX
-   ============================================================= */
+
 .bonus-container, .coin-rain-container {
   position: fixed; inset: 0;
   pointer-events: none;

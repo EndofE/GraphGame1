@@ -1,4 +1,4 @@
-// game.js -- main game loop, graph rendering, scoring, UI
+// game.js contains main game loop, graph rendering, scoring, UI
 
 import {
   getNextFunction,
@@ -45,7 +45,7 @@ let gameStats = {
   solved: 0,
   solvedFirstTry: 0,
   revealedCount: 0,
-  byCategory: {}, // { [cat]: {seen, solved, firstTry, reveals, avgTimeSec} }
+  byCategory: {}, //  [cat]: {seen, solved, firstTry, reveals, avgTimeSec}
   skillScore: 0,   // numeric skill, drives difficulty
   avgSolveTime: 0,
 };
@@ -58,9 +58,7 @@ let audioCtx = null;
 let soundEnabled = false;
 let audioInitialized = false;
 
-// =====================================================
 // DOM refs
-// =====================================================
 const homeScreen       = document.getElementById('homeScreen');
 const settingsScreen   = document.getElementById('settingsScreen');
 const howToScreen      = document.getElementById('howToScreen');
@@ -104,15 +102,13 @@ const analysisDoneBtn  = document.getElementById('analysisDoneBtn');
 const closeAnalysisTab = document.getElementById('closeAnalysisTab');
 const bonusContainer   = document.getElementById('bonusContainer');
 
-// =====================================================
+// 
 // BUTTON PRESS ANIMATION HELPER
 // For .hit-btn buttons: the visible button top is a sibling
 // <img class="top-layer"> identified by data-target. The hit
 // button itself is transparent; we toggle `.pressed` on the
-// linked top layer, which translates down by --press-y (half
-// the shadow reveal), then pops back before firing the handler.
-// Legacy .asset-btn buttons still animate themselves via CSS.
-// =====================================================
+// linked top layer, which translates down to lower over the shadow, then pops back before firing the handler.
+// .asset-btn buttons still animate themselves via CSS.
 function pressAndRun(btn, handler) {
   if (!btn) return;
   const targetId = btn.dataset ? btn.dataset.target : null;
@@ -142,9 +138,8 @@ function pressAndRun(btn, handler) {
   });
 }
 
-// =====================================================
+
 // NAVIGATION
-// =====================================================
 function showScreen(screen) {
   [homeScreen, settingsScreen, howToScreen, gameScreen].forEach(s => {
     if (s) s.style.display = 'none';
@@ -192,9 +187,7 @@ function goToMenu() {
   showScreen(homeScreen);
 }
 
-// =====================================================
 // GRAPH RENDERING
-// =====================================================
 function drawGraph(userExpr = null) {
   lastUserExpr = userExpr;
   const w = canvas.width, h = canvas.height;
@@ -271,7 +264,7 @@ function drawGraph(userExpr = null) {
   ctx.lineTo(w, mapY(0));
   ctx.stroke();
 
-  // user guess (solid green) with error-band shading
+  // user guess in green with error-band shading
   if (userExpr && gameActive) {
     let userVals = [];
     for (let i = 0; i <= SAMPLES; i++) {
@@ -325,9 +318,7 @@ function drawGraph(userExpr = null) {
   ctx.setLineDash([]);
 }
 
-// =====================================================
 // MATCH EVALUATION
-// =====================================================
 function evaluateMatch(userExpr) {
   const SAMPLES = 200;
   const xMin = -5, xMax = 5;
@@ -356,9 +347,7 @@ function evaluateMatch(userExpr) {
   return { accuracy: Math.round(accuracy * 10) / 10 };
 }
 
-// =====================================================
 // INPUT NORMALIZATION
-// =====================================================
 function normalizeFunctionString(expr) {
   let s = expr.toLowerCase();
   s = s.replace(/\s+/g, '');
@@ -392,9 +381,7 @@ functionInput.addEventListener('input', (e) => {
   }
 });
 
-// =====================================================
 // AUDIO
-// =====================================================
 function initAudio() {
   if (audioCtx) return;
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -422,9 +409,7 @@ function playSound(type) {
   osc.stop(audioCtx.currentTime + duration);
 }
 
-// =====================================================
 // COIN / BONUS FX
-// =====================================================
 function spawnCoins(amount, fromX = 300, fromY = 300) {
   const coinCount = Math.min(12, Math.max(1, amount));
   for (let i = 0; i < coinCount; i++) {
@@ -448,9 +433,7 @@ function showBonusMessage(text) {
   setTimeout(() => popup.remove(), 1900);
 }
 
-// =====================================================
 // UI UPDATERS
-// =====================================================
 function updateTimerDisplay() {
   timerEl.textContent = timerSeconds;
   timerEl.classList.remove('timer-warning', 'timer-critical');
@@ -501,9 +484,7 @@ function updateSkillLevel() {
   }
 }
 
-// =====================================================
 // GAME FLOW
-// =====================================================
 function resetForNewGraph() {
   attemptCount = 0;
   revealed = false;

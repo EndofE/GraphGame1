@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --check game.js)",
+      "Bash(node --check ai.js)",
+      "Bash(node --check server.js)",
+      "Bash(node server.js)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:3001/)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:3001/pngAssets/HomePage.png)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:3001/pngAssets/PlayFull.png)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(file *.png)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3)"
+    ]
+  }
+}

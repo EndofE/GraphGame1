@@ -148,7 +148,6 @@ function localHintFallback({ target, guesses, attempt, previousHint }) {
       observations.push('The target flips sign across the y-axis — odd symmetry.');
   }
 
-  // monotonic / oscillation
   if (fin(t[-2]) && fin(t[2])) {
     if (t[2] > t[-2] + 0.3) observations.push('The target rises overall from left to right.');
     else if (t[2] < t[-2] - 0.3) observations.push('The target falls overall from left to right.');
